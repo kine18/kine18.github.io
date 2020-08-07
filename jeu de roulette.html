@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="jeu de roulette.css" rel="stylesheet" type="text/css" />
+    <title>LaRoulette</title>
+</head>
+
+<body>
+    <div>
+        Porte monnaie = <span id="porteMonnaie">100</span> (en milliers de francs)
+    </div>
+    <div>
+        Pertes = <span id="pertes">0</span> (en milliers de francs)
+
+    </div>
+    <div>
+        <label for="pari">Votre pari</label>
+        <select name="pari" id="pari">
+            <option value="Pair"> Pair</option>
+            <option value="Impair"> Impair</option>
+            <option value="1"> 1</option>
+            <option value="2"> 2</option>
+            <option value="3"> 3</option>
+            <option value="4"> 4</option>
+            <option value="5"> 5</option>
+            <option value="6"> 6</option>
+            <option value="7"> 7</option>
+            <option value="8"> 8</option>
+            <option value="9"> 9</option>
+            <option value="10"> 10</option>
+            <option value="11"> 11</option>
+            <option value="12"> 12</option>
+            <option value="13"> 13</option>
+            <option value="14"> 14</option>
+            <option value="15"> 15</option>
+            <option value="16"> 16</option>
+            <option value="17"> 17</option>
+            <option value="18"> 18</option>
+            <option value="19"> 19</option>
+            <option value="20"> 20</option>
+            <option value="21"> 21</option>
+            <option value="22"> 22</option>
+            <option value="23"> 23</option>
+            <option value="24"> 24</option>
+            <option value="25"> 25</option>
+            <option value="26"> 26</option>
+            <option value="27"> 27</option>
+            <option value="28"> 28</option>
+            <option value="29"> 29</option>
+            <option value="30"> 30</option>
+            <option value="31"> 31</option>
+            <option value="32"> 32</option>
+            <option value="33"> 33</option>
+            <option value="34"> 34</option>
+            <option value="35"> 35</option>
+            <option value="36"> 36</option>
+        </select>
+    </div>
+    <div>
+        <label for="mise">Votre mise (en milliers de francs)</label>
+        <input type="number" name="mise" id="mise" min="1"  />
+    </div> 
+    <button style="float:left;"  onclick="go()">Go !</button>
+    <input  type="button" value="tourner la roue!" style="float:none;" id='tourner' /> 
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <script src="script.js"></script>
+
+    <script>
+
+var options = ["0", "32", "15", "19", "4", "21", "2", "25", "17", "34", "6", "27", "13", "36", "11", "30", "8", "23", "10", "5", "24", "16", "33", "1", "20", "44", "31", "9", "22", "18", "29", "7", "28", "12", "35", "3", "26"];
+  
+  var angleDepart = 0;
+  var arc = Math.PI / (options.length / 2);
+  var delaiRotation = null;
+  
+  var debutArcRotation = 10;
+  var tempsRotation = 0;
+  var tempsRotationTotal = 0;
+  
+  var ctx;
+  
+  document.getElementById("tourner").addEventListener("click", tourner);
+  
+  function dessinerRoulette() {
+    var canvas = document.getElementById("canvas");
+    if (canvas.getContext) {
+      var rayonExterieur = 200;
+      var rayonText = 160;
+      var rayonInterieur = 125;
+  
+      ctx = canvas.getContext("2d");
+      ctx.clearRect(0,0,500,500);
+  
+      ctx.strokeStyle = "black";  
+      ctx.lineWidth = 2;
+  
+      ctx.font = 'bold 12px Helvetica, Arial';
+  
+      for(var i = 0; i < options.length; i++) {
+        var angle = angleDepart + i * arc;
+        
+        if(i === 0) {
+          ctx.fillStyle = '#0C0'  
+        } else {
+          ctx.fillStyle = (i % 2 === 0) ? '#000' : '#C00';
+        }
+        
+        ctx.beginPath();
+        ctx.arc(250, 250, rayonExterieur, angle, angle + arc, false);
+        ctx.arc(250, 250, rayonInterieur, angle + arc, angle, true);
+        ctx.stroke();
+        ctx.fill();
+  
+        ctx.save();
+        
+        
+        ctx.fillStyle = 'yellow'  
+        
+        ctx.translate(250 + Math.cos(angle + arc / 2) * rayonText, 
+                      250 + Math.sin(angle + arc / 2) * rayonText);
+        ctx.rotate(angle + arc / 2 + Math.PI / 2);
+        var text = options[i];
+        ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+        ctx.restore();
+      } 
+  
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.moveTo(250 - 4, 250 - (rayonExterieur + 5));
+      ctx.lineTo(250 + 4, 250 - (rayonExterieur + 5));
+      ctx.lineTo(250 + 4, 250 - (rayonExterieur - 5));
+      ctx.lineTo(250 + 9, 250 - (rayonExterieur - 5));
+      ctx.lineTo(250 + 0, 250 - (rayonExterieur- 13));
+      ctx.lineTo(250 - 9, 250 - (rayonExterieur- 5));
+      ctx.lineTo(250 - 4, 250 - (rayonExterieur- 5));
+      ctx.lineTo(250 - 4, 250 - (rayonExterieur+ 5));
+      ctx.fill();
+    }
+  }
+  
+  function tourner() {
+    debutAngleRotation = Math.random() * 10 + 10;
+    tempsRotation = 0;
+    tempsRotationTotal = Math.random() * 10 * 1000;
+    tournerRoue();
+  }
+  
+  function tournerRoue() {
+    tempsRotation += 30;
+    if(tempsRotation >= tempsRotationTotal ) {
+      arretRotation();
+      return;
+    }
+    var angleRotation = debutAngleRotation - easeOut(tempsRotation, 0, debutAngleRotation, tempsRotationTotal);
+    angleDepart += (angleRotation * Math.PI / 180);
+    dessinerRoulette();
+    delaiRotation = setTimeout('tournerRoue()', 30);
+  }
+  
+  function arretRotation() {
+    clearTimeout(delaiRotation);
+    var degrees = angleDepart * 180 / Math.PI + 90;
+    var arcd = arc * 180 / Math.PI;
+    var index = Math.floor((360 - degrees % 360) / arcd);
+    ctx.save();
+    ctx.font = 'bold 30px Helvetica, Arial';
+    var text = options[index];
+    ctx.fillText(text, 250 - ctx.measureText(text).width / 2, 250 + 10);
+    ctx.restore();
+    return this.text;
+  }
+  
+  function easeOut(t, b, c, d) {
+    var ts = (t/=d)*t;
+    var tc = ts*t;
+    return b+c*(tc + -3*ts + 3*t);
+  }
+  
+  dessinerRoulette();
+</script>
+  
+
+<script>
+    // Initialisation porte monnaie
+var porteMonnaie = 100;
+// Initialisation porte monnaie ordi (pertes joueur)
+var pertes = 0;
+
+function go() {
+  var perdu = false;
+  // Recuperation pari choisi dans le menu select
+  var pari = document.getElementById("pari").value;
+  // Recuperation mise
+  var mise = parseInt(document.getElementById("mise").value);
+
+  if (porteMonnaie == 0) {
+    alert("Votre porte monnaie est vide");
+  } else if (mise > porteMonnaie) {
+    alert("La somme misée est supérieure à celle de votre porte monnaie");
+  } else {
+    // Initialisation gain
+    var gain = 0;
+    // Mise retirée du porte monnaie
+    porteMonnaie -= mise;
+
+    // Entier aléatoire entre 0 et 36
+    var resultat = Math.round(Math.random() * 36);
+
+    if (resultat == 0) {
+      // Si l'ordi tire 0, on perd
+      perdu = true;
+    } else if (resultat == pari) {
+      // Si l'ordi tire le meme nombre, on gagne
+      gain = mise + mise * 35;
+    } else if (
+      (pari == "Pair" && resultat % 2 == 0) ||
+      (pari == "Impair" && resultat % 2 != 0)
+    ) {
+      // Si on choisi 'Pair' et que l'ordi tire un nombre pair, on gagne.
+      // Même chose pour le choix 'Impair'
+      gain = mise + mise;
+    } else {
+      // Dans tous les autres cas, on perd
+      perdu = true;
+    }
+
+    if (perdu) {
+      alert("PERDU ! Resultat = " + resultat + "\nMise Perdue = " + mise);
+      pertes += mise;
+    } else {
+      alert("GAGNÉ ! Resultat = " + resultat + "\nMise Rendue = " + gain);
+      porteMonnaie += gain;
+    }
+    document.getElementById("porteMonnaie").innerText = porteMonnaie;
+    document.getElementById("pertes").innerText = pertes;
+  }
+}
+
+</script>
+</body>
+
+</html>
